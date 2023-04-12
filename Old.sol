@@ -5,17 +5,18 @@ contract LandRegistry {
     // all land id stored
     uint256[] public registerdLands;
 
-    event sendPropertyId(uint256 _id);
-
     function getRegisteredLandCount() public view returns (uint256) {
         return registerdLands.length;
     }
 
+    event sendPropertyId(uint256 _id);
+    event sendPropertyIds(uint256[] _id);
+
     struct document {
         string docId;
-        string name;
-        string link;
         string hash;
+        string link;
+        string name;
         bool verified;
     }
 
@@ -114,12 +115,6 @@ contract LandRegistry {
         uint256 surveyNumber;
         uint256 subSurveyNumber;
         string createdOn;
-        // documents
-        document[] documents;
-        // string[] docName;
-        // string[] docLink;
-        // string[] dochash;
-        // bool[] docVerified;
     }
 
     // we are not using public below as solidity doesnt allow netested fetching by default
@@ -132,7 +127,7 @@ contract LandRegistry {
     function registerNewProperty(
         // fill all the details of the property
         inputvariables memory variable
-    ) public returns (uint256) {
+    ) public {
         Property storage tempProperty = properties[++propertyCount];
         tempProperty.propertyId = propertyCount;
 
@@ -167,9 +162,9 @@ contract LandRegistry {
         for (uint256 i = 0; i < variable.documents.length; i++) {
             document memory newDocument = document(
                 variable.documents[i].docId,
-                variable.documents[i].name,
-                variable.documents[i].link,
                 variable.documents[i].hash,
+                variable.documents[i].link,
+                variable.documents[i].name,
                 true
             );
             tempProperty.documentNames.push(variable.documents[i].name);
@@ -177,8 +172,8 @@ contract LandRegistry {
         }
 
         registerdLands.push(propertyCount);
+
         emit sendPropertyId(propertyCount);
-        return propertyCount;
     }
 
     function transferOwnership(
@@ -195,11 +190,6 @@ contract LandRegistry {
             bytes(property.ownerName).length != 0,
             "Property does not exist"
         );
-        // property.ownerName = _newOwnerName;
-        // property.aadharCardNumber = _newOwnerAadhaarCardNumber;
-        // property.panCardNumber = _newOwnerPanCardNumber;
-        // property.addressProofA = _newOwnerAddressProofA;
-        // property.addressProofB = _newOwnerAddressProofB;
 
         uint256[] memory splitLandID;
         // setting struct values
@@ -282,6 +272,8 @@ contract LandRegistry {
             tempProperty.transfered = true;
             tempProperty.transferedTo = propertyCount;
         }
+
+        emit sendPropertyId(propertyCount);
     }
 
     struct splitPropertyInputs {
@@ -295,10 +287,10 @@ contract LandRegistry {
         uint256[] _surveyNumber;
         uint256[] _subSurveyNumber;
         // documents
-        string[] _documentsId;
-        string[] _documentsName;
+        string[] _documentsDocId;
         string[] _documentsHash;
         string[] _documentsLink;
+        string[] _documentsName;
     }
 
     // parameter example:- (1,"234234",["harsh","krishna"],["123","123"],["addr","addr"],[45,76],["456","456"],["789","789"])
@@ -350,12 +342,13 @@ contract LandRegistry {
                 j++
             ) {
                 document memory newDocument = document(
-                    inputParameters._documentsId[j],
-                    inputParameters._documentsName[j],
-                    inputParameters._documentsLink[j],
+                    inputParameters._documentsDocId[j],
                     inputParameters._documentsHash[j],
+                    inputParameters._documentsLink[j],
+                    inputParameters._documentsName[j],
                     true
                 );
+
                 tempProperty.documentNames.push(
                     inputParameters._documentsName[j]
                 );
@@ -369,6 +362,9 @@ contract LandRegistry {
 
             // setting splitted land values
             ancestor.propertySplitLandId.push(propertyCount);
+
+            // emit event
+            emit sendPropertyId(propertyCount);
         }
     }
 
@@ -376,34 +372,6 @@ contract LandRegistry {
         uint256 _propertyId
     ) public view returns (outputvariables memory) {
         Property storage tempProperty = properties[_propertyId];
-
-        // filling up documents
-        document[] memory documents = new document[](tempProperty.documentNames.length);
-        // string[] memory docLink;
-        // string[] memory dochash;
-        // bool[] memory docVerified;
-        for (
-            uint256 i = 0;
-            i < tempProperty.documentNames.length || i < 7;
-            i++
-        ) {
-
-        // string memory documentName = tempProperty.documentNames[i];
-        // documents[i] = tempProperty.documents[documentName];
-            
-        // documents.push(tempProperty.documents[documentName].name);
-
-        // docLink.push(tempProperty.documents[documentName].link);
-        // dochash.push(tempProperty.documents[documentName].hash);
-        // docVerified.push(tempProperty.documents[documentName].verified);
-        // documents[0] = tempProperty.documents[tempProperty.documentNames[0]];
-        // documents[1] = tempProperty.documents[tempProperty.documentNames[1]];
-        // documents[2] = tempProperty.documents[tempProperty.documentNames[2]];
-        // documents[3] = tempProperty.documents[tempProperty.documentNames[3]];
-        // documents[4] = tempProperty.documents[tempProperty.documentNames[4]];
-        // documents[5] = tempProperty.documents[tempProperty.documentNames[5]];
-        // documents[6] = tempProperty.documents[tempProperty.documentNames[6]];
-        }
 
         outputvariables memory returnValue = outputvariables(
             tempProperty.propertyHouseNumber,
@@ -428,10 +396,8 @@ contract LandRegistry {
             // ownership details
             tempProperty.surveyNumber,
             tempProperty.subSurveyNumber,
-            tempProperty.createdOn,
-            // documents
-            documents
+            tempProperty.createdOn
         );
-        return returnValue;
+        return (returnValue);
     }
 }
