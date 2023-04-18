@@ -270,6 +270,20 @@ contract LandRegistry {
         property.subSurveyNumber = variable.subSurveyNumber;
         property.createdOn = variable.createdOn;
 
+        property.transferedFrom = variable.transferedFrom;
+
+        for (uint256 i = 0; i < variable.documents.length; i++) {
+            document memory newDocument = document(
+                variable.documents[i].docId,
+                variable.documents[i].name,
+                variable.documents[i].link,
+                variable.documents[i].hash,
+                true
+            );
+            property.documentNames.push(variable.documents[i].name);
+            property.documents[variable.documents[i].name] = newDocument;
+        }
+
         // registering new mapping of land
         registerdLands.push(propertyCount);
 
@@ -282,6 +296,8 @@ contract LandRegistry {
             tempProperty.transfered = true;
             tempProperty.transferedTo = propertyCount;
         }
+
+        emit sendPropertyId(propertyCount);
     }
 
     struct splitPropertyInputs {
@@ -367,6 +383,8 @@ contract LandRegistry {
             // registering new mapping of land
             registerdLands.push(propertyCount);
 
+            emit sendPropertyId(propertyCount);
+
             // setting splitted land values
             ancestor.propertySplitLandId.push(propertyCount);
         }
@@ -377,33 +395,14 @@ contract LandRegistry {
     ) public view returns (outputvariables memory) {
         Property storage tempProperty = properties[_propertyId];
 
+        uint256 documentLength = tempProperty.documentNames.length;
         // filling up documents
-        document[] memory documents = new document[](tempProperty.documentNames.length);
-        // string[] memory docLink;
-        // string[] memory dochash;
-        // bool[] memory docVerified;
-        // for (
-        //     uint256 i = 0;
-        //     i < tempProperty.documentNames.length || i < 7;
-        //     i++
-        // ) {
+        document[] memory documents = new document[](documentLength);
 
-        // string memory documentName = tempProperty.documentNames[i];
-        // documents[i] = tempProperty.documents[documentName];
-            
-        // documents.push(tempProperty.documents[documentName].name);
-
-        // docLink.push(tempProperty.documents[documentName].link);
-        // dochash.push(tempProperty.documents[documentName].hash);
-        // docVerified.push(tempProperty.documents[documentName].verified);
-        documents[0] = tempProperty.documents[tempProperty.documentNames[0]];
-        // documents[1] = tempProperty.documents[tempProperty.documentNames[1]];
-        // documents[2] = tempProperty.documents[tempProperty.documentNames[2]];
-        // documents[3] = tempProperty.documents[tempProperty.documentNames[3]];
-        // documents[4] = tempProperty.documents[tempProperty.documentNames[4]];
-        // documents[5] = tempProperty.documents[tempProperty.documentNames[5]];
-        // documents[6] = tempProperty.documents[tempProperty.documentNames[6]];
-        // }
+        for (uint256 i = 0; i < documentLength; i++) {
+            string memory documentName = tempProperty.documentNames[i];
+            documents[i] = tempProperty.documents[documentName];
+        }
 
         outputvariables memory returnValue = outputvariables(
             tempProperty.propertyHouseNumber,
