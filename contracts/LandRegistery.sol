@@ -382,11 +382,11 @@ contract LandRegistry {
         // string[] memory docLink;
         // string[] memory dochash;
         // bool[] memory docVerified;
-        for (
-            uint256 i = 0;
-            i < tempProperty.documentNames.length || i < 7;
-            i++
-        ) {
+        // for (
+        //     uint256 i = 0;
+        //     i < tempProperty.documentNames.length || i < 7;
+        //     i++
+        // ) {
 
         // string memory documentName = tempProperty.documentNames[i];
         // documents[i] = tempProperty.documents[documentName];
@@ -396,14 +396,14 @@ contract LandRegistry {
         // docLink.push(tempProperty.documents[documentName].link);
         // dochash.push(tempProperty.documents[documentName].hash);
         // docVerified.push(tempProperty.documents[documentName].verified);
-        // documents[0] = tempProperty.documents[tempProperty.documentNames[0]];
+        documents[0] = tempProperty.documents[tempProperty.documentNames[0]];
         // documents[1] = tempProperty.documents[tempProperty.documentNames[1]];
         // documents[2] = tempProperty.documents[tempProperty.documentNames[2]];
         // documents[3] = tempProperty.documents[tempProperty.documentNames[3]];
         // documents[4] = tempProperty.documents[tempProperty.documentNames[4]];
         // documents[5] = tempProperty.documents[tempProperty.documentNames[5]];
         // documents[6] = tempProperty.documents[tempProperty.documentNames[6]];
-        }
+        // }
 
         outputvariables memory returnValue = outputvariables(
             tempProperty.propertyHouseNumber,
